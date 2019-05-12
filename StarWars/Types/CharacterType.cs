@@ -8,6 +8,8 @@ namespace StarWars.Types
     {
         protected override void Configure(IInterfaceTypeDescriptor descriptor)
         {
+            descriptor.Description("The Character Description.");
+
             descriptor.Name("Character");
 
             descriptor.Field("id")

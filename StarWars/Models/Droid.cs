@@ -16,5 +16,7 @@ namespace StarWars.Models
         public string PrimaryFunction { get; set; }
 
         public double Height { get; } = 0.72;
+
+        public bool Restrained { get; } = false;
     }
 }

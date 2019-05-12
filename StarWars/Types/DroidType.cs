@@ -9,6 +9,8 @@ namespace StarWars.Types
     {
         protected override void Configure(IObjectTypeDescriptor<Droid> descriptor)
         {
+            descriptor.Description("The Droid Description.");
+
             descriptor.Interface<CharacterType>();
 
             descriptor.Field(t => t.Id)
@@ -25,6 +27,12 @@ namespace StarWars.Types
                 .Type<FloatType>()
                 .Argument("unit", a => a.Type<EnumType<Unit>>())
                 .Name("height");
+
+            descriptor.Field(t => t.Restrained)
+                .Type<BooleanType>()
+                .Description("Restraining bolt installed?")
+                .DeprecationReason("Not used anymore.")
+                .Name("restrained");
         }
     }
 }

@@ -9,6 +9,8 @@ namespace StarWars.Types
     {
         protected override void Configure(IObjectTypeDescriptor<Starship> descriptor)
         {
+            descriptor.Description("Starship stuff.");
+
             descriptor.Field(t => t.Id)
                 .Type<NonNullType<IdType>>();
 
