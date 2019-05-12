@@ -19,7 +19,7 @@ namespace StarWars.Resolvers
         public double GetLength(Unit? unit, [Parent]Starship starship)
             => ConvertToUnit(starship.Length, unit);
 
-        private double ConvertToUnit(double length, Unit? unit) => 
+        private static double ConvertToUnit(double length, Unit? unit) => 
             unit == Unit.Foot ? length * 3.28084 : length;
     }
 }
