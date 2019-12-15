@@ -31,7 +31,7 @@ namespace StarWars.Types
             descriptor.Field(t => t.Restrained)
                 .Type<BooleanType>()
                 .Description("Restraining bolt installed?")
-                .DeprecationReason("Not used anymore.")
+                .Deprecated("Not used anymore.")
                 .Name("restrained");
         }
     }
