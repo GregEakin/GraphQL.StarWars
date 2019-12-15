@@ -1,6 +1,6 @@
-﻿using System;
+﻿using StarWars.Models;
+using System;
 using System.Collections.Generic;
-using StarWars.Models;
 
 namespace StarWars.Data
 {
