@@ -1,3 +1,5 @@
+using System.Security.Claims;
+using System.Threading.Tasks;
 using HotChocolate;
 using HotChocolate.AspNetCore;
 using HotChocolate.AspNetCore.Voyager;
@@ -8,8 +10,6 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using StarWars.Data;
 using StarWars.Types;
-using System.Security.Claims;
-using System.Threading.Tasks;
 
 namespace StarWars
 {
@@ -62,19 +62,6 @@ namespace StarWars
                         context.User.HasClaim(c =>
                             (c.Type == ClaimTypes.Country))));
             });
-
-            //Note: comment app.UseGraphQL("/graphql"); and uncomment this
-            //section in order to simulate a user that has a country claim and
-            //passes the configured authorization rule.
-            //app.UseGraphQL();
-            services.AddQueryRequestInterceptor((ctx, builder, ct) =>
-            {
-                var identity = new ClaimsIdentity("abc");
-                identity.AddClaim(new Claim(ClaimTypes.Country, "us"));
-                ctx.User = new ClaimsPrincipal(identity);
-                builder.SetProperty(nameof(ClaimsPrincipal), ctx.User);
-                return Task.CompletedTask;
-            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -89,5 +76,23 @@ namespace StarWars
             app.UseGraphiQL();
             app.UsePlayground();
             app.UseVoyager();
+
+            //Note: comment app.UseGraphQL("/graphql"); and uncomment this
+            //section in order to simulate a user that has a country claim and
+            //passes the configured authorization rule.
+            app.UseGraphQL();
+            // app.UseGraphQL(new QueryMiddlewareOptions
+            // {
+            //     Path = "/",
+            //     OnCreateRequest = (ctx, builder, ct) =>
+            //     {
+            //         var identity = new ClaimsIdentity("abc");
+            //         identity.AddClaim(new Claim(ClaimTypes.Country, "us"));
+            //         ctx.User = new ClaimsPrincipal(identity);
+            //         builder.SetProperty(nameof(ClaimsPrincipal), ctx.User);
+            //         return Task.CompletedTask;
+            //     }
+            // });
+        }
     }
 }
