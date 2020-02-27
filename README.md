@@ -2,11 +2,11 @@
 A sample implementatoin of [QraphQL](https://graphql.org) using [Hot Chocolate](https://github.com/ChilliCream/hotchocolate).
 
 ## Service Points:
- * http://localhost:55820/
- * http://localhost:55820/graphql/
- * http://localhost:55820/graphql/graphiql/
- * http://localhost:55820/graphql/playground/
- * http://localhost:55820/graphql/voyager/
+ * https://localhost:44333/
+ * https://localhost:44333/graphql/
+ * https://localhost:44333/graphql/graphiql/
+ * https://localhost:44333/graphql/playground/
+ * https://localhost:44333/graphql/voyager/
 
  ## This example was cretaed witnh these [NetCLI steps](https://hotchocolate.io/docs/dotnet-cli):
  ```PowerShell

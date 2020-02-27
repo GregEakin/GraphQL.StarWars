@@ -17,12 +17,12 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="10.3.0-preview.8" />
-    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.65" />
+    <PackageReference Include="HotChocolate.AspNetCore.Voyager" Version="11.0.0-preview.99" />
+    <PackageReference Include="HotChocolate.AspNetCore" Version="11.0.0-preview.99" />
     <PackageReference Include="HotChocolate.AspNetCore.GraphiQL" Version="11.0.0-preview.65" />
-    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.65" />
-    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.0-preview.65" />
-    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="11.0.0-preview.65" />
+    <PackageReference Include="HotChocolate.AspNetCore.Playground" Version="11.0.0-preview.99" />
+    <PackageReference Include="HotChocolate.AspNetCore.Authorization" Version="11.0.0-preview.99" />
+    <PackageReference Include="HotChocolate.Subscriptions.InMemory" Version="11.0.0-preview.99" />
   </ItemGroup>
 
 </Project>
