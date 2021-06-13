@@ -1,28 +1,10 @@
-// Copyright 2019 Greg Eakin
-// 
-// Licensed under the Apache License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License.
-// You may obtain a copy of the License at:
-//     http://www.apache.org/licenses/LICENSE-2.0
-// 
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-// See the License for the specific language governing permissions and
-// limitations under the License.
-
-using HotChocolate;
-using HotChocolate.AspNetCore;
-using HotChocolate.AspNetCore.Voyager;
-using HotChocolate.Execution.Configuration;
-using HotChocolate.Subscriptions;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.DependencyInjection;
-using StarWars.Data;
-using StarWars.Types;
-using System.Security.Claims;
 using Microsoft.Extensions.Hosting;
+using StarWars.Characters;
+using StarWars.Repositories;
+using StarWars.Reviews;
 
 namespace StarWars
 {
@@ -32,71 +14,71 @@ namespace StarWars
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add the custom services like repositories etc ...
-            services.AddSingleton<CharacterRepository>();
-            services.AddSingleton<ReviewRepository>();
+            services
+                // In order to use the ASP.NET Core routing we need to add the routing services.
+                .AddRouting()
 
-            // Add in-memory event provider
-            services.AddInMemorySubscriptionProvider();
+                // We will add some in-memory repositories that hold the in-memory data for this GraphQL server.
+                .AddSingleton<ICharacterRepository, CharacterRepository>()
+                .AddSingleton<IReviewRepository, ReviewRepository>()
 
-            // Add GraphQL Services
-            services.AddGraphQL(sp => SchemaBuilder.New()
-                .AddServices(sp)
+                // Next we are adding our GraphQL server configuration. 
+                // We can host multiple named GraphQL server configurations
+                // that can be exposed on different routes.
+                .AddGraphQLServer()
 
-                // Adds the authorize directive and
-                // enable the authorization middleware.
-                .AddAuthorizeDirectiveType()
+                    // The query types are split into two classes,
+                    // by splitting the types into several class we can organize 
+                    // our query fields by topics and also am able to test
+                    // them separately.
+                    .AddQueryType()
+                        .AddTypeExtension<CharacterQueries>()
+                        .AddTypeExtension<ReviewQueries>()
+                    .AddMutationType()
+                        .AddTypeExtension<ReviewMutations>()
+                    .AddSubscriptionType()
+                        .AddTypeExtension<ReviewSubscriptions>()
 
-                .AddQueryType<QueryType>()
-                .AddMutationType<MutationType>()
-                .AddSubscriptionType<SubscriptionType>()
-                .AddType<HumanType>()
-                .AddType<DroidType>()
-                .AddType<EpisodeType>()
-                .Create(),
-                new QueryExecutionOptions
-                {
-                    TracingPreference = TracingPreference.Always
-                });
+                    // The type discover is very good in exploring the types that we are using 
+                    // but sometimes when a GraphQL field for instance only exposes an interface 
+                    // we need to provide we need to provide the implementation types that we want
+                    // to host in our GraphQL schema.
+                    .AddType<Human>()
+                    .AddType<Droid>()
+                    .AddType<Starship>()
+                    .AddTypeExtension<CharacterResolvers>()
 
+                    // Add filtering and sorting capabilities.
+                    .AddFiltering()
+                    .AddSorting()
 
-            // Add Authorization Policy
-            services.AddAuthorization(options =>
-            {
-                options.AddPolicy("HasCountry", policy =>
-                    policy.RequireAssertion(context =>
-                        context.User.HasClaim(c =>
-                            (c.Type == ClaimTypes.Country))));
-            });
+                    // if you wanted to controll the pagination settings globally you could
+                    // do so by setting the paging options.
+                    // .SetPagingOptions()
 
-            /*
-            Note: uncomment this
-            section in order to simulate a user that has a country claim and
-            passes the configured authorization rule.
+                    // Since we are exposing a subscription type we also need a pub/sub system 
+                    // handling the subscription events. For our little demo here we will use 
+                    // an in-memory pub/sub system.
+                    .AddInMemorySubscriptions()
 
-            services.AddQueryRequestInterceptor((ctx, builder, ct) =>
-            {
-                var identity = new ClaimsIdentity("abc");
-                identity.AddClaim(new Claim(ClaimTypes.Country, "us"));
-                ctx.User = new ClaimsPrincipal(identity);
-                builder.SetProperty(nameof(ClaimsPrincipal), ctx.User);
-                return Task.CompletedTask;
-            });
-            */
+                    // Last we will add apollo tracing to our server which by default is 
+                    // only activated through the X-APOLLO-TRACING:1 header.
+                    .AddApolloTracing();
         }
 
-        // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
-            if (env.IsDevelopment()) 
+            if (env.IsDevelopment())
+            {
                 app.UseDeveloperExceptionPage();
+            }
 
+            // in order to expose our GraphQL schema we need to map the GraphQL server 
+            // to a specific route. By default it is mapped onto /graphql.
             app
                 .UseWebSockets()
-                .UseGraphQL("/graphql")
-                .UseGraphiQL("/graphql")
-                .UsePlayground("/graphql")
-                .UseVoyager("/graphql");
+                .UseRouting()
+                .UseEndpoints(endpoint => endpoint.MapGraphQL());
         }
     }
 }
