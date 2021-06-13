@@ -7,8 +7,8 @@ namespace StarWars.Repositories
 {
     public class CharacterRepository : ICharacterRepository
     {
-        private Dictionary<int, ICharacter> _characters;
-        private Dictionary<int, Starship> _starships;
+        private readonly Dictionary<int, ICharacter> _characters;
+        private readonly Dictionary<int, Starship> _starships;
 
         public CharacterRepository()
         {
@@ -21,9 +21,9 @@ namespace StarWars.Repositories
 
         public IEnumerable<ICharacter> GetCharacters(int[] ids)
         {
-            foreach (int id in ids)
+            foreach (var id in ids)
             {
-                if (_characters.TryGetValue(id, out ICharacter? c))
+                if (_characters.TryGetValue(id, out var c))
                 {
                     yield return c;
                 }

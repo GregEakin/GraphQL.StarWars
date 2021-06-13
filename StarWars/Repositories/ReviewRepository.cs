@@ -7,12 +7,11 @@ namespace StarWars.Repositories
 {
     public class ReviewRepository : IReviewRepository
     {
-        private readonly Dictionary<Episode, List<Review>> _data =
-            new Dictionary<Episode, List<Review>>();
+        private readonly Dictionary<Episode, List<Review>> _data = new();
 
         public void AddReview(Episode episode, Review review)
         {
-            if (!_data.TryGetValue(episode, out List<Review>? reviews))
+            if (!_data.TryGetValue(episode, out var reviews))
             {
                 reviews = new List<Review>();
                 _data[episode] = reviews;
@@ -23,10 +22,11 @@ namespace StarWars.Repositories
 
         public IEnumerable<Review> GetReviews(Episode episode)
         {
-            if (_data.TryGetValue(episode, out List<Review>? reviews))
+            if (_data.TryGetValue(episode, out var reviews))
             {
                 return reviews;
             }
+
             return Array.Empty<Review>();
         }
     }

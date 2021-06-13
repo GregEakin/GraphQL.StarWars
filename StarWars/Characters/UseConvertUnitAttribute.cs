@@ -11,32 +11,33 @@ namespace StarWars.Characters
     public sealed class UseConvertUnitAttribute : DescriptorAttribute
     {
         protected override void TryConfigure(
-            IDescriptorContext context,
+            IDescriptorContext context2,
             IDescriptor descriptor,
             ICustomAttributeProvider element)
         {
-            if (descriptor is IObjectFieldDescriptor objectField)
+            switch (descriptor)
             {
-                objectField
-                    .Argument("unit", a => a.Type<EnumType<Unit>>().DefaultValue(Unit.Meters))
-                    .Use(next => async context =>
-                    {
-                        await next(context).ConfigureAwait(false);
-
-                        if (context.Result is double length)
+                case IObjectFieldDescriptor objectField:
+                    objectField
+                        .Argument("unit", a => a.Type<EnumType<Unit>>().DefaultValue(Unit.Meters))
+                        .Use(next => async context =>
                         {
-                            context.Result = ConvertToUnit(length, context.ArgumentValue<Unit>("unit"));
-                        }
-                    });
-            }
-            else if (descriptor is IInterfaceFieldDescriptor interfaceField)
-            {
-                interfaceField
-                    .Argument("unit", a => a.Type<EnumType<Unit>>().DefaultValue(Unit.Meters));
+                            await next(context).ConfigureAwait(false);
+
+                            if (context.Result is double length)
+                            {
+                                context.Result = ConvertToUnit(length, context.ArgumentValue<Unit>("unit"));
+                            }
+                        });
+                    break;
+                case IInterfaceFieldDescriptor interfaceField:
+                    interfaceField
+                        .Argument("unit", a => a.Type<EnumType<Unit>>().DefaultValue(Unit.Meters));
+                    break;
             }
         }
 
-        private double ConvertToUnit(double length, Unit unit)
+        private static double ConvertToUnit(double length, Unit unit)
         {
             if (unit == Unit.Foot)
             {
